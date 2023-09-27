@@ -1,23 +1,20 @@
 package handler
 
 import (
+	"auth-service/pkg/service"
 	"context"
 	"net/http"
 	"regexp"
-
 	"strings"
 )
 
 type Handler struct {
+	services *service.Service
 }
 
-//func (h *Handler) InitRoutes() *http {
-//	mux := http.NewServeMux()
-//
-//	mux.HandleFunc("/")
-//
-//	mux.Ge
-//}
+func NewHandler(services *service.Service) *Handler {
+	return &Handler{services: services}
+}
 
 type route struct {
 	method  string
@@ -25,20 +22,15 @@ type route struct {
 	handler http.HandlerFunc
 }
 
-//var routes = []route{
-//	newRoute("GET", "/", signUp),
-//	newRoute("POST", "/sign-in", refresh),
-//	newRoute("GET", "/fec", home),
-//}
-
 func newRoute(method, pattern string, handler http.HandlerFunc) route {
 	return route{method, regexp.MustCompile("^" + pattern + "$"), handler}
 }
 
 func (h *Handler) Serve(w http.ResponseWriter, r *http.Request) {
 	var routes = []route{
-		newRoute("GET", "/", h.signUp),
-		newRoute("POST", "/sign-in", h.refresh),
+		newRoute("POST", "/sign-up", h.signUp),
+		newRoute("POST", "/sign-in", h.signIn),
+		newRoute("POST", "/refresh", h.refresh),
 	}
 	var allow []string
 	for _, route := range routes {
